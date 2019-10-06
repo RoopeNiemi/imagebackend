@@ -18,4 +18,8 @@ db = SQLAlchemy(app)
 
 
 from app import routes, models
-db.create_all()
+
+try: 
+    db.create_all()
+except:
+    pass
