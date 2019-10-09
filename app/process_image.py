@@ -2,7 +2,7 @@ from PIL import Image
 import os
 
 def create_and_save_grayscale(path_to_image):
-    img = Image.open(path_to_image).convert('LA')
+    img = Image.open(path_to_image).convert('L')
 
     img_name = os.path.basename(path_to_image)
     dot_index = img_name.index('.')
