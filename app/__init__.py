@@ -13,7 +13,7 @@ else:
     app.config["SQLALCHEMY_ECHO"] = True
 
 app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
-
+app.config["SECRET_KEY"] = os.urandom(32)
 db = SQLAlchemy(app)
 
 

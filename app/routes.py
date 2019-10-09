@@ -1,30 +1,43 @@
 from app import app, db
-from flask import request
+from flask import request, Response, send_file
+from sqlalchemy.sql import text
 from werkzeug.utils import secure_filename
 from.models import Image
 import os
 
+_TYPES=['jpg', 'jpeg', 'png']
+_FOLDER = app.config['UPLOAD_FOLDER']
+
 @app.route('/')
 @app.route('/index')
 def index():
-    return "Hello, World!"
+    stmt = text("SELECT image_name FROM image")
+    names = db.engine.execute(stmt)
+    res = [row['image_name'] for row in names]
+    return Response(status=200, response=res)
 
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
-    print("HERE")
     if request.method == 'POST':
         file = request.files['file']
-        print(request.form)
         username = request.form['user']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
+        if not file or file.filename == '':
             flash('No selected file')
-            return "NO"
-        if file:
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            img = Image(username = username, image_name=filename)
-            db.session().add(img)
-            db.session().commit()
-            return filename
+            return Response(status=400)
+        return save_file(file, username)
+    return Response(status=200)
+
+def save_file(file, username):
+    """
+    Saves file to local directory and filename to database
+    """
+    filename = secure_filename(file.filename)
+    file_type = filename.split(".")[1]
+    if file_type not in _TYPES:
+        return Response(status=403, response='Wrong type of image. Accepted formats: {}'.format(_TYPES))
+    file_save_location = os.path.join(_FOLDER, filename)
+    file.save(file_save_location)
+    img = Image(username = username, image_name=filename)
+    db.session().add(img)
+    db.session().commit()
+    return send_file(file_save_location, mimetype="image/{}".format(file_type))
