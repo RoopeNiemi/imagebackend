@@ -4,6 +4,7 @@ from sqlalchemy.sql import text
 from werkzeug.utils import secure_filename
 from.models import Image
 import os
+from .process_image import create_and_save_grayscale
 
 _TYPES=['jpg', 'jpeg', 'png']
 _FOLDER = app.config['UPLOAD_FOLDER']
@@ -19,14 +20,9 @@ def index():
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        print("WE SHOULD BE HERE AT THE VERY LEAST")
-        print(request.mimetype)
-        print(request.values)
-        print(request._load_form_data)
         file = request.files['file']
         if not file or file.filename == '':
             flash('No selected file')
-            print("NO SELECTED FILE")
             return Response(status=400, response="No selected file")
         return save_file(file)
     return Response(status=200)
@@ -44,4 +40,5 @@ def save_file(file):
     img = Image(image_name=filename)
     db.session().add(img)
     db.session().commit()
+    grayscale_loc = create_and_save_grayscale(file_save_location)
     return send_file(file_save_location, mimetype="image/{}".format(file_type))
