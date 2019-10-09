@@ -9,4 +9,4 @@ def create_and_save_grayscale(path_to_image):
     grayscale_name = img_name[:dot_index] + "_grayscale" + img_name[dot_index:]
     grayscale_loc = os.path.join(os.path.dirname(path_to_image), grayscale_name)
     img.save(grayscale_loc)
-    return grayscale_loc
+    return grayscale_loc, grayscale_name

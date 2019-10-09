@@ -37,8 +37,12 @@ def save_file(file):
         return Response(status=403, response='Wrong type of image. Accepted formats: {}'.format(_TYPES))
     file_save_location = os.path.join(_FOLDER, filename)
     file.save(file_save_location)
-    img = Image(image_name=filename)
+    save_to_database(filename)
+    grayscale_loc, grayscale_name = create_and_save_grayscale(file_save_location)
+    save_to_database(grayscale_name)
+    return send_file(grayscale_loc, mimetype="image/{}".format(file_type))
+
+def save_to_database(filename):
+    img = Image(image_name=filename):
     db.session().add(img)
     db.session().commit()
-    grayscale_loc = create_and_save_grayscale(file_save_location)
-    return send_file(grayscale_loc, mimetype="image/{}".format(file_type))
