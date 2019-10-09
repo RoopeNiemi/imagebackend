@@ -19,17 +19,14 @@ def index():
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        print(request)
-        print(request.data)
         file = request.files['file']
-        username = request.form['user']
         if not file or file.filename == '':
             flash('No selected file')
             return Response(status=400)
-        return save_file(file, username)
+        return save_file(file)
     return Response(status=200)
 
-def save_file(file, username):
+def save_file(file):
     """
     Saves file to local directory and filename to database
     """
@@ -39,7 +36,7 @@ def save_file(file, username):
         return Response(status=403, response='Wrong type of image. Accepted formats: {}'.format(_TYPES))
     file_save_location = os.path.join(_FOLDER, filename)
     file.save(file_save_location)
-    img = Image(username = username, image_name=filename)
+    img = Image(image_name=filename)
     db.session().add(img)
     db.session().commit()
     return send_file(file_save_location, mimetype="image/{}".format(file_type))
