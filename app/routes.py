@@ -20,6 +20,8 @@ def index():
 def upload_file():
     if request.method == 'POST':
         file = request.files['file']
+        print(file)
+        print(file.filename)
         if not file or file.filename == '':
             flash('No selected file')
             print("NO SELECTED FILE")
