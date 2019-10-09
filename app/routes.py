@@ -19,6 +19,8 @@ def index():
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
+        print(request)
+        print(request.data)
         file = request.files['file']
         username = request.form['user']
         if not file or file.filename == '':
