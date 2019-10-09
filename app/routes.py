@@ -22,6 +22,7 @@ def upload_file():
         file = request.files['file']
         if not file or file.filename == '':
             flash('No selected file')
+            print("NO SELECTED FILE")
             return Response(status=400, response="No selected file")
         return save_file(file)
     return Response(status=200)
