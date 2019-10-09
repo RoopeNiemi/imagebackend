@@ -43,6 +43,6 @@ def save_file(file):
     return send_file(grayscale_loc, mimetype="image/{}".format(file_type))
 
 def save_to_database(filename):
-    img = Image(image_name=filename):
+    img = Image(image_name=filename)
     db.session().add(img)
     db.session().commit()
