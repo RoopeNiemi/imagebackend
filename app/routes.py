@@ -41,4 +41,4 @@ def save_file(file):
     db.session().add(img)
     db.session().commit()
     grayscale_loc = create_and_save_grayscale(file_save_location)
-    return send_file(file_save_location, mimetype="image/{}".format(file_type))
+    return send_file(grayscale_loc, mimetype="image/{}".format(file_type))
