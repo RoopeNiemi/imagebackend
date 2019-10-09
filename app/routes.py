@@ -20,9 +20,10 @@ def index():
 def upload_file():
     if request.method == 'POST':
         print("WE SHOULD BE HERE AT THE VERY LEAST")
+        print(request.mimetype)
+        print(request.values)
+        print(request._load_form_data)
         file = request.files['file']
-        print("FILE::::", file)
-        print("NAME::::", file.filename)
         if not file or file.filename == '':
             flash('No selected file')
             print("NO SELECTED FILE")
