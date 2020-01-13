@@ -1,6 +1,9 @@
 from flask import Flask
+from flask_cors import CORS
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder= os.path.join(os.path.dirname(os.path.realpath(__file__)), "static"))
+cors = CORS(app)
 import os
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,7 +15,7 @@ else:
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///images.db"    
     app.config["SQLALCHEMY_ECHO"] = True
 
-app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
+app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "static")
 app.config["SECRET_KEY"] = os.urandom(32)
 db = SQLAlchemy(app)
 

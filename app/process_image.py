@@ -1,12 +1,43 @@
+from PIL.ExifTags import GPSTAGS, TAGS
 from PIL import Image
 import os
 
-def create_and_save_grayscale(path_to_image):
-    img = Image.open(path_to_image).convert('L')
+def extract_coordinates(image):
+    image = Image.open(image)
+    decoded = get_decoded(image)
+    lat, lon = get_gps_info(decoded)
+    return lat, lon
 
-    img_name = os.path.basename(path_to_image)
-    dot_index = img_name.index('.')
-    grayscale_name = img_name[:dot_index] + "_grayscale" + img_name[dot_index:]
-    grayscale_loc = os.path.join(os.path.dirname(path_to_image), grayscale_name)
-    img.save(grayscale_loc)
-    return grayscale_loc, grayscale_name
+def get_gps_info(decoded):
+    try:
+        GPSdict = decoded['GPSInfo']
+        dlat = GPSdict[2][0][0]/GPSdict[2][0][1]
+        mlat = (GPSdict[2][1][0]/GPSdict[2][1][1])/60
+        slat = (GPSdict[2][2][0]/GPSdict[2][2][1])/3600
+        dlon = GPSdict[4][0][0]/GPSdict[4][0][1]
+        mlon = (GPSdict[4][1][0]/GPSdict[4][1][1])/60
+        slon = (GPSdict[4][2][0]/GPSdict[4][2][1])/3600
+        if GPSdict[1] == 'N':
+            lat = dlat+mlat+slat
+        else:
+            lat = (dlat+mlat+slat)*-1
+        if GPSdict[3] == 'E':
+            lon = dlon+mlon+slon
+        else:
+            lon = (dlon+mlon+slon)*-1
+        return "%.8f" % lat, "%.8f" % lon
+    except:
+        print('JPG file but no GPS')
+        print('--------------- ')
+        print('  ')
+        return None, None
+
+def get_decoded(image):
+    info = image._getexif()
+    ret = {}
+    for tag, value in info.items():
+        decoded = TAGS.get(tag, tag)
+        ret[decoded] = value
+    return ret
+
+

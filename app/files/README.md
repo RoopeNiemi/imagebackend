@@ -1,1 +1,0 @@
-# Directory where images are uploaded to
