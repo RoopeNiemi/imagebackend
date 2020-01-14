@@ -4,8 +4,8 @@ class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image_name = db.Column(db.String(64), index=True, unique=True)
     created_utc = db.Column(db.DateTime, default=db.func.current_timestamp())
-    longitude = db.Column(db.String(12))
-    latitude = db.Column(db.String(12))
+    longitude = db.Column(db.String(12), nullable=True)
+    latitude = db.Column(db.String(12), nullable=True)
 
 
     def __init__(self, image_name, latitude, longitude):

@@ -14,7 +14,7 @@ _MAX_LON_LAT = 90.0
 @app.route('/')
 @app.route('/index')
 def index():
-    images = modelImage.query.filter(modelImage.latitude.isnot("")).filter(modelImage.longitude.isnot(""))
+    images = modelImage.query.filter(modelImage.latitude.isnot(None)).filter(modelImage.longitude.isnot(None))
     return Response(filenames_to_json(images))
 
 @app.route('/upload', methods = ['POST'])

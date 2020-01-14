@@ -6,7 +6,7 @@ def extract_coordinates(image):
     image = Image.open(image)
     decoded = get_decoded(image)
     if decoded == None:
-        return "", ""
+        return None, None
     lat, lon = get_gps_info(decoded)
     return lat, lon
 
