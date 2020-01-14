@@ -5,6 +5,8 @@ import os
 def extract_coordinates(image):
     image = Image.open(image)
     decoded = get_decoded(image)
+    if decoded == None:
+        return "", ""
     lat, lon = get_gps_info(decoded)
     return lat, lon
 
@@ -30,10 +32,12 @@ def get_gps_info(decoded):
         print('JPG file but no GPS')
         print('--------------- ')
         print('  ')
-        return None, None
+        return "", ""
 
 def get_decoded(image):
     info = image._getexif()
+    if info == None:
+        return None
     ret = {}
     for tag, value in info.items():
         decoded = TAGS.get(tag, tag)

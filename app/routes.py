@@ -14,7 +14,7 @@ _MAX_LON_LAT = 90.0
 @app.route('/')
 @app.route('/index')
 def index():
-    images = modelImage.query.all()
+    images = modelImage.query.filter(modelImage.latitude.isnot("")).filter(modelImage.longitude.isnot(""))
     return Response(filenames_to_json(images))
 
 @app.route('/upload', methods = ['POST'])
@@ -22,7 +22,10 @@ def upload_file():
     file = request.files['file']
     if not file or file.filename == '':
         return Response(status=400, response="Request did not contain a file")
-    return save_file(file)
+    file_save_location, filename = save_file(file)
+    lat, lon = extract_coordinates(file_save_location)
+    save_to_database(filename, lat, lon)
+    return Response(status=200, response="Image uploaded")
 
 def save_file(file):
     """
@@ -34,11 +37,7 @@ def save_file(file):
         return Response(status=403, response='Wrong type of image. Accepted formats: {}'.format(_TYPES))
     file_save_location = os.path.join(_FOLDER, filename)
     file.save(file_save_location)
-    lat, lon = extract_coordinates(file_save_location)
-    if lat is None or lon is None:
-        return Response(status=400, response="Image did not contain GPS-info")
-    save_to_database(filename, lat, lon)
-    return send_file(file_save_location, mimetype="image/{}".format(file_type))
+    return file_save_location, filename
 
 
 def filenames_to_json(files):
