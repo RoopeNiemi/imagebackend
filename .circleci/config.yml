@@ -45,6 +45,7 @@ jobs:
       - image: buildpack-deps:trusty
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Deploy Master to Heroku
           command: |
