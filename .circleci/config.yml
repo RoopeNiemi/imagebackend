@@ -45,8 +45,7 @@ jobs:
       - image: circleci/golang:1.13-alpine
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - run: |
             docker login --username=$HEROKU_EMAIL --password=$HEROKU_API_KEY registry.heroku.com
             docker build -t registry.heroku.com/imagepr-testing/web .
