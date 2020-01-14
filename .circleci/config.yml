@@ -42,13 +42,12 @@ jobs:
           
   deploy:
     docker:
-      - image: buildpack-deps:trusty
+      - image: circleci/golang:1.13-alpine
     steps:
       - checkout
-      - setup_remote_docker
-      - run:
-          name: Deploy Master to Heroku
-          command: |
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: |
             docker login --username=$HEROKU_EMAIL --password=$HEROKU_API_KEY registry.heroku.com
             docker build -t registry.heroku.com/imagepr-testing/web .
             docker push registry.heroku.com/imagepr-testing/web
