@@ -7,6 +7,10 @@ import os
 import json
 from .process_image import *
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 _TYPES=['jpg', 'jpeg', 'png']
 _FOLDER = app.config['UPLOAD_FOLDER']
 _MIN_LON_LAT = -90.0
@@ -51,11 +55,15 @@ def save_to_database(filename, lat, lon):
 
 @app.route("/search", methods=["GET"])
 def find_between_coordinates():
-    min_longitude, max_longitude, min_latitude, max_latitude = process_query_params(request.args)
-    files = modelImage.query\
-        .filter(modelImage.longitude.between(min_longitude, max_longitude))\
-        .filter(modelImage.latitude.between(min_latitude, max_latitude))
-    return Response(filenames_to_json(files))
+    try:
+        min_longitude, max_longitude, min_latitude, max_latitude = process_query_params(request.args)
+        files = modelImage.query\
+            .filter(modelImage.longitude.between(min_longitude, max_longitude))\
+            .filter(modelImage.latitude.between(min_latitude, max_latitude))
+        return Response(filenames_to_json(files))
+    except:
+        logger.exception(e)
+        return Response(json.dumps([]))
 
 def process_query_params(args):
     min_longitude = args_value_or_default(args.get("min_lon"), _MIN_LON_LAT)
