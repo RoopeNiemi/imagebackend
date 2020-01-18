@@ -24,5 +24,6 @@ from app import routes, models
 
 try: 
     db.create_all()
+    routes.save_image_info_from_s3_to_database()
 except:
     pass

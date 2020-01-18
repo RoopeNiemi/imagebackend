@@ -1,4 +1,5 @@
 from app import app, db
+from .aws_helper import AwsHelper
 from flask import request, Response, send_file, Flask, redirect, render_template, jsonify
 from sqlalchemy.sql import text
 from werkzeug.utils import secure_filename
@@ -15,6 +16,10 @@ _TYPES=['jpg', 'jpeg', 'png']
 _FOLDER = app.config['UPLOAD_FOLDER']
 _MIN_LON_LAT = -90.0
 _MAX_LON_LAT = 90.0
+
+aws = AwsHelper(_FOLDER)
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -29,6 +34,7 @@ def upload_file():
     file_save_location, filename = save_file(file)
     lat, lon = extract_coordinates(file_save_location)
     save_to_database(filename, lat, lon)
+    aws.upload_to_s3(filename)
     return Response(status=200, response="Image uploaded")
 
 def save_file(file):
@@ -61,7 +67,7 @@ def find_between_coordinates():
             .filter(modelImage.longitude.between(min_longitude, max_longitude))\
             .filter(modelImage.latitude.between(min_latitude, max_latitude))
         return Response(filenames_to_json(files))
-    except:
+    except Exception as e:
         logger.exception(e)
         return Response(json.dumps([]))
 
@@ -76,4 +82,13 @@ def args_value_or_default(value, default_value):
     if not value:
         return default_value
     return float(value)
+
+
+def save_image_info_from_s3_to_database():
+    """ Extracts GPS-data from images received from S3 and saves those and the filenames to database """
+    objects_from_s3 = aws.populate_local_folder()
+    for f in objects_from_s3:
+        lat, lon = extract_coordinates(f)
+        filename = os.path.basename(f)
+        save_to_database(filename, lat, lon) 
 
