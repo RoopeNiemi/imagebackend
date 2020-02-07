@@ -17,7 +17,7 @@ class AwsHelper():
 
 
     def populate_local_folder(self):
-        """ Download every file from S3 that does not already exist locally to local folder """
+        """ Download every file from S3 that does not already exist locally and save them to local folder """
         response = self.s3.Bucket(_BUCKET).objects.all()
         objects_from_s3 = []
         for obj in response:
