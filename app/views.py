@@ -151,4 +151,5 @@ def delete_user():
     if not account or not account.is_correct_password(password):
         return Response(status=400, response="Wrong username or password")
     db.session().delete(account)
+    db.session().commit()
     return Response(status=200, response="User deleted")
