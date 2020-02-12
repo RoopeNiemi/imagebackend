@@ -8,7 +8,7 @@ from .models import Account
 import bcrypt
 import os
 import json
-from .process_image import *
+from .process_image import extract_coordinates
 from pathlib import Path
 
 import logging
@@ -122,7 +122,7 @@ def login():
     password = data['password']
     account = Account.query.filter_by(username=username).first()
     if not account or not account.is_correct_password(password):
-        return Response(status=400, response="Username not found")
+        return Response(status=400, response="Wrong username or password")
     else:
         access_token = create_access_token(identity=username)
         return jsonify(access_token=access_token, user=username)
@@ -140,3 +140,15 @@ def auth_register():
         return Response(status=200)
     else:
         return Response(status=400)     
+
+
+@app.route("/delete", methods=["POST"])
+def delete_user():
+    data = json.loads(request.data)
+    username = data['username']
+    password = data['password']
+    account = Account.query.filter_by(username=username).first()
+    if not account or not account.is_correct_password(password):
+        return Response(status=400, response="Wrong username or password")
+    db.session().delete(account)
+    return Response(status=200, response="User deleted")
